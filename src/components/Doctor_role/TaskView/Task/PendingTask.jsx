@@ -7,6 +7,8 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Screen from '../../DoctorScreen/Screen';
+import { useDispatch } from "react-redux";
+import currentFormData from '../../../../store/actions/currentFormAction.types';
 import { useHistory,Link,Route } from "react-router-dom";
 import axios from 'axios';
 const useStyles = makeStyles({
@@ -40,9 +42,10 @@ function PendingTask(props){
     const [taskData, setTaskData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [currentData, setCurrentData] = useState({
-      patient_id:'',
-      Appointment_id:''
+      patientId:'',
+      appointmentId:''
     });
+    const dispatch = useDispatch();
     useEffect (()=>{
       if(taskData.length==0){
           axios.get('/api/task')
@@ -72,21 +75,32 @@ function PendingTask(props){
           }
     },[taskData])
     console.log("fData",filteredData);
-    const onClick = (d)=>{
+    
+      //function onSave(){  
+       
+      //}
+
+      const onClick = (event,d)=>{
+        event.preventDefault();
         console.log("patient_id:",filteredData[d].patient_id);
         console.log("Appointment_id:",filteredData[d].sourceId);
-        setCurrentData({patient_id:filteredData[d].patient_id,Appointment_id:filteredData[d].sourceId});
+        const data = {patientId:filteredData[d].patient_id,appointmentId:filteredData[d].sourceId};
+        console.log("data",data);
+        setCurrentData(data);
         console.log("currentData",currentData);
-    }
-
-    const onchange=(i)=>{
-      console.log('index',i);
-    }
+        console.log("event",event.target);
+        //dispatch(currentFormData(currentData));
+      }
+      useEffect(()=>{
+        if(currentData.patientId!==''&&currentData.appointmentId!==''){
+          console.log("current",currentData);
+          dispatch(currentFormData(currentData));
+          props.history.push("/Screen");
+          }
+        },[currentData]);
+      
     return (
       <div>
-        
-          
-          
            <Grid>
             {filteredData && filteredData.map((data,i)=>{
             return <Grid item xs={12} key={i}>
@@ -111,8 +125,8 @@ function PendingTask(props){
                               <b>Status: </b>{data.status}
                             </Grid>
                             <Grid item xs={2} container justify="flex-end">
-                              <Link to={'/Screen'}>
-                                <Button variant="contained" color="primary" size="small" key={i}  onClick={()=>onClick(i)}>Screen</Button>
+                              <Link onClick={(e)=>{onClick(e,i)}}>
+                                <Button variant="contained" color="primary" size="small" key={i} >Screen</Button>
                               </Link>
                             </Grid>
                           </Grid>

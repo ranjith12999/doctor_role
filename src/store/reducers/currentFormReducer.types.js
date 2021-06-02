@@ -8,10 +8,11 @@ const formReducer = (state=initialState,action) => {
     switch(action.type){
         case ActionTypes.CURRENT_FORM_DATA:
             return{
-                formData : state.formData.concat(action.payload),
+                formData : action.payload,
             } 
     }
-    return state
+    return state;
 }
+
 
 export default formReducer;

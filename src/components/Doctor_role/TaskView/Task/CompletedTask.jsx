@@ -1,4 +1,4 @@
-import React from'react';
+import React,{useEffect,useState} from'react';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -6,6 +6,7 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import axios from 'axios';
 
 const useStyles = makeStyles({
   root: {
@@ -33,39 +34,59 @@ const useStyles = makeStyles({
 
 function CompletedTask(){
     const classes = useStyles();
+    const [completed, setCompleted] = useState([]);
+
+    useEffect(()=>{
+      if(completed.length==0){
+        axios.get('/api/getCompletedData')
+        .then((response)=>{
+            const data = response.data;
+            setCompleted(data);
+            console.log("data has been recieved");
+        })
+        .catch(()=>{
+            alert("data have n't recieved");
+        })
+      }
+    },[completed])
+    console.log('data',completed);
     return(
-        <Grid>
-          <Grid item xs={12}>
-            <Card className={classes.root} variant="outlined">
-                <CardContent>
-                    <Typography className={classes.title} color="textSecondary" gutterBottom>
-                      <Grid item spacing={2}>
-                        <Grid container>
-                          <Grid item xs={2} >
-                            <b>Patient ID: </b>PID001
-                          </Grid>
-                          <Grid item xs={2} >
-                            <b>Appointment ID: </b>APID001
-                          </Grid>
-                          <Grid item xs={2} >
-                            <b>Patient Name: </b>Abishek
-                          </Grid>
-                          <Grid item xs={2} >
-                            <b>Chief Complaint: </b>Fever
-                          </Grid>
-                          <Grid item xs={2} >
-                            <b>Status: </b>COMPLETED
-                          </Grid>
-                          <Grid item xs={2} container justify="flex-end">
-                            <Button variant="contained" color="primary" size="small" disabled >Screen</Button>
+      completed.map((val,i)=>{
+        return(
+          <Grid key={i}>
+            <Grid item xs={12}>
+              <Card className={classes.root} variant="outlined">
+                  <CardContent>
+                      <Typography className={classes.title} color="textSecondary" gutterBottom>
+                        <Grid item spacing={2}>
+                          <Grid container>
+                            <Grid item xs={2} >
+                              <b>Patient ID: </b>{val.patient_id}
+                            </Grid>
+                            <Grid item xs={2} >
+                              <b>Appointment ID: </b>{val.source_id}
+                            </Grid>
+                            <Grid item xs={2} >
+                              <b>Patient Name: </b>{val.name}
+                            </Grid>
+                            <Grid item xs={2} >
+                              <b>Chief Complaint: </b>{val.complaint}
+                            </Grid>
+                            <Grid item xs={2} >
+                              <b>Status: </b>COMPLETED
+                            </Grid>
+                            <Grid item xs={2} container justify="flex-end">
+                              <Button variant="contained" color="primary" size="small" disabled >Screen</Button>
+                            </Grid>
                           </Grid>
                         </Grid>
-                      </Grid>
-                    </Typography>
-                </CardContent>
-            </Card>
-          </Grid> 
-      </Grid>
+                      </Typography>
+                  </CardContent>
+              </Card>
+            </Grid> 
+        </Grid>
+        )
+      })
     )
 }
 
